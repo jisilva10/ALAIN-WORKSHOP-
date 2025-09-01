@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A’LAIN Workshop Assistant</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.5.1",
+    "marked": "https://esm.sh/marked@^12.0.2",
+    "dompurify": "https://esm.sh/dompurify@^3.0.8",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="app-container">
+        <main id="main-content">
+            <header id="main-header">
+                <div id="header-top-row">
+                    <div id="header-left-controls">
+                        <button id="new-chat-btn" class="header-text-btn" aria-label="Reiniciar conversación" title="Reiniciar conversación">
+                            <i class="fas fa-sync-alt"></i> Reiniciar
+                        </button>
+                    </div>
+                    <div id="header-title-group">
+                        <div id="logo-container">
+                            <img id="main-profektus-logo" src="https://i.imgur.com/H3Bl5Vs.png" alt="Profektus Logo">
+                        </div>
+                        <h1 id="app-main-title-header">A’LAIN Workshop Assistant</h1>
+                    </div>
+                    <div id="header-right-controls">
+                        <img src="https://i.imgur.com/MMaTIyA.png" alt="Company Logo" class="header-logo-right">
+                    </div>
+                </div>
+            </header>
+            <div id="chat-messages">
+                <!-- Chat messages will be displayed here -->
+            </div>
+            <div id="chat-input-container">
+                <button id="dictate-btn" aria-label="Iniciar dictado por voz" title="Iniciar dictado por voz">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <div id="chat-input-wrapper">
+                    <textarea id="chat-input" placeholder="Escribe tu mensaje..." aria-label="Entrada de mensaje"></textarea>
+                </div>
+                <button id="send-btn" aria-label="Enviar mensaje" title="Enviar mensaje">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </main>
+    </div>
+    
+    <script type="module" src="index.tsx"></script>
+</body>
+</html>

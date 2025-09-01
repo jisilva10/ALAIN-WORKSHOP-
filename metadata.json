@@ -1,0 +1,8 @@
+{
+  "name": "A'LAIN Workshop Assistant",
+  "description": "An AI assistant for workshop participants to generate ideas and structure professional responses.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "prompt": ""
+}
