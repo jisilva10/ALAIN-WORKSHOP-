@@ -117,7 +117,6 @@ const chatInput = document.getElementById('chat-input') as HTMLTextAreaElement;
 const sendBtn = document.getElementById('send-btn') as HTMLButtonElement;
 const mainContentDiv = document.getElementById('main-content') as HTMLDivElement;
 const dictateBtn = document.getElementById('dictate-btn') as HTMLButtonElement;
-const newChatBtn = document.getElementById('new-chat-btn') as HTMLButtonElement;
 // --- END DOM SELECTORS ---
 
 // --- START Helper Functions ---
@@ -481,47 +480,6 @@ function setAppHeight() {
 // --- END Dynamic Viewport Height ---
 
 // --- START Chat Logic and State Management ---
-function handleNewChat() {
-    if (confirm("¿Estás seguro de que quieres reiniciar la conversación? Se borrará el historial para empezar desde cero.")) {
-        // 1. Clear state variables
-        currentChatSession = null;
-        editingMessageId = null;
-        isLoading = false;
-
-        // 2. Clear persistent storage
-        localStorage.removeItem('alainClientChat');
-
-        // 3. Create the initial welcome message for both session history and UI
-        chatSessionMessages = [
-            { role: 'model', parts: [{ text: WELCOME_MESSAGE }] }
-        ];
-
-        uiMessages = [
-            {
-                id: `ai-welcome-${Date.now()}`,
-                sender: 'ai',
-                text: WELCOME_MESSAGE,
-                timestamp: new Date()
-            }
-        ];
-        
-        // 4. Save the new state to storage
-        saveClientChat();
-
-        // 5. Re-render the UI with only the welcome message
-        renderMessages();
-
-        // 6. Initialize a new chat session with the API
-        initializeChatSession();
-        
-        // 7. Reset the input field
-        if (chatInput) {
-            chatInput.value = '';
-            handleChatInput();
-        }
-    }
-}
-
 
 function addMessageToChat(
     sender: 'user' | 'ai' | 'system' | 'error',
@@ -756,7 +714,6 @@ function initializeDictation() {
 
 function setupEventListeners() {
     sendBtn?.addEventListener('click', handleSendMessage);
-    newChatBtn?.addEventListener('click', handleNewChat);
     chatInput?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();

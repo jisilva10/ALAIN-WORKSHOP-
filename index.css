@@ -137,7 +137,8 @@ body {
 
 #header-left-controls {
     display: flex;
-    justify-content: flex-start;
+    align-items: center;
+    gap: 0.75rem;
     flex: 1;
 }
 #header-right-controls {
@@ -193,16 +194,6 @@ body {
     color: var(--text-brand);
     background-color: var(--brand-pastel);
     border-color: var(--border-brand-strong);
-}
-
-
-#header-title-group {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 0.75rem;
 }
 
 #app-main-title-header {
