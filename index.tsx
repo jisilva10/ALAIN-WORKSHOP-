@@ -117,6 +117,10 @@ const chatInput = document.getElementById('chat-input') as HTMLTextAreaElement;
 const sendBtn = document.getElementById('send-btn') as HTMLButtonElement;
 const mainContentDiv = document.getElementById('main-content') as HTMLDivElement;
 const dictateBtn = document.getElementById('dictate-btn') as HTMLButtonElement;
+const headerClickableArea = document.getElementById('header-clickable-area');
+const resetChatModal = document.getElementById('reset-chat-modal');
+const confirmResetBtn = document.getElementById('confirm-reset-btn');
+const cancelResetBtn = document.getElementById('cancel-reset-btn');
 // --- END DOM SELECTORS ---
 
 // --- START Helper Functions ---
@@ -658,6 +662,25 @@ async function handleSendMessage() {
     await sendPromptToAI(parts, userMessageId);
 }
 
+function handleResetChat() {
+    // Clear state
+    chatSessionMessages = [];
+    uiMessages = [];
+    localStorage.removeItem('alainClientChat');
+
+    // Hide modal
+    if (resetChatModal) {
+        resetChatModal.classList.add('hidden');
+    }
+
+    // Re-initialize with welcome message
+    chatSessionMessages.push({ role: 'model', parts: [{ text: WELCOME_MESSAGE }] });
+    saveClientChat();
+
+    // Re-render and re-initialize API session
+    loadAndRenderChat();
+}
+
 // --- END Chat Logic and State Management ---
 
 function initializeDictation() {
@@ -722,6 +745,22 @@ function setupEventListeners() {
     });
     chatInput?.addEventListener('input', handleChatInput);
     window.addEventListener('resize', setAppHeight);
+
+    headerClickableArea?.addEventListener('click', () => {
+        resetChatModal?.classList.remove('hidden');
+    });
+
+    cancelResetBtn?.addEventListener('click', () => {
+        resetChatModal?.classList.add('hidden');
+    });
+
+    confirmResetBtn?.addEventListener('click', handleResetChat);
+
+    resetChatModal?.addEventListener('click', (e) => {
+        if (e.target === resetChatModal) {
+            resetChatModal.classList.add('hidden');
+        }
+    });
 }
 
 function initializeChatSession() {

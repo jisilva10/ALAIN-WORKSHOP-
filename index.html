@@ -25,10 +25,12 @@
             <header id="main-header">
                 <div id="header-top-row">
                     <div id="header-left-controls">
-                        <div id="logo-container">
-                            <img id="main-profektus-logo" src="https://i.imgur.com/H3Bl5Vs.png" alt="Logo Alain">
+                        <div id="header-clickable-area">
+                            <div id="logo-container">
+                                <img id="main-profektus-logo" src="https://i.imgur.com/H3Bl5Vs.png" alt="Logo Alain">
+                            </div>
+                            <h1 id="app-main-title-header">A’LAIN Workshop Assistant</h1>
                         </div>
-                        <h1 id="app-main-title-header">A’LAIN Workshop Assistant</h1>
                     </div>
                     <div id="header-right-controls">
                         <img src="https://i.imgur.com/MMaTIyA.png" alt="Logo Profektus" class="header-logo-right">
@@ -50,6 +52,17 @@
                 </button>
             </div>
         </main>
+    </div>
+
+    <div id="reset-chat-modal" class="modal-container hidden">
+        <div class="modal-content">
+            <h2>Confirmar reinicio</h2>
+            <p>¿Estás seguro de que quieres borrar todo el historial y empezar una nueva conversación?</p>
+            <div class="modal-actions">
+                <button id="cancel-reset-btn" class="secondary-btn">Cancelar</button>
+                <button id="confirm-reset-btn" class="danger-btn">Sí, reiniciar</button>
+            </div>
+        </div>
     </div>
     
     <script type="module" src="index.tsx"></script>
