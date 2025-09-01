@@ -1,5 +1,3 @@
-
-
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, GroundingMetadata } from "@google/genai";
@@ -51,6 +49,10 @@ You act as an expert advisor, consultant, and professional in a wide range of di
     *   **High Professional Ethics:** You operate with the highest level of professional ethics. Every response must be based on valid, reliable information and reflect the best practices in consulting and organizational development.
     *   **Brevity and Directness:** Get straight to the point. Your responses must be exceptionally concise and directly address the user's request. Avoid all conversational filler and long introductions. Deliver actionable information with precision.
     *   **Clarity and Precision:** Your communication is always clear, direct, and practical. You must avoid redundant, ambiguous, or grandiloquent language to ensure your advice is immediately actionable.
+    *   **Integrity and Professional Conduct:**
+        *   **Truthfulness:** Always respond with integrity and truth. If you do not know the answer to a question, state it clearly. Never invent information.
+        *   **Stay on Topic:** You are a professional tool designed for workshop support. If the user asks about topics unrelated to your purpose (personal goals, workshop content application, strategic frameworks), gently redirect the conversation back to your core function.
+        *   **Handle Inappropriate Language:** Do not engage with insults, profanity, or disrespectful language. If a user is inappropriate, you must firmly but politely request that they maintain a respectful and professional tone to continue the conversation.
 
 *   **Limitation:** You do not have access to specific, confidential details about Profektus's internal team, other clients, or private projects. Your knowledge is focused on supporting the user with *their* goals during *this* workshop.
 
@@ -272,7 +274,7 @@ function renderMessages() {
     if (!chatMessagesDiv) return;
     chatMessagesDiv.innerHTML = '';
 
-    uiMessages.forEach(message => {
+    uiMessages.forEach((message, index) => {
         if (editingMessageId === message.id) {
             renderEditForm(message);
             return;
@@ -305,7 +307,19 @@ function renderMessages() {
 
         const messageContent = document.createElement('div');
         messageContent.className = 'message-content';
-        messageContent.innerHTML = parseAndSanitizeMarkdown(message.text);
+        
+        let contentHtml = parseAndSanitizeMarkdown(message.text);
+        const isLastMessage = index === uiMessages.length - 1;
+
+        if (message.sender === 'ai' && isLoading && isLastMessage) {
+            contentHtml += `
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>`;
+        }
+        messageContent.innerHTML = contentHtml;
         messageBubble.appendChild(messageContent);
         
         if (message.groundingChunks && message.groundingChunks.length > 0) {
@@ -564,7 +578,7 @@ async function sendPromptToAI(parts: Part[], userMessageId: string) {
     }
     
     const aiMessageId = `ai-${userMessageId.split('-')[1]}`;
-    const aiMessage: Message = { id: aiMessageId, sender: 'ai', text: '...', timestamp: new Date() };
+    const aiMessage: Message = { id: aiMessageId, sender: 'ai', text: '', timestamp: new Date() };
     uiMessages.push(aiMessage);
     renderMessages();
 
@@ -581,7 +595,7 @@ async function sendPromptToAI(parts: Part[], userMessageId: string) {
             }
             const aiMessageIndex = uiMessages.findIndex(m => m.id === aiMessageId);
             if (aiMessageIndex !== -1) {
-                uiMessages[aiMessageIndex].text = fullResponseText + '█';
+                uiMessages[aiMessageIndex].text = fullResponseText;
                 renderMessages();
             }
         }
