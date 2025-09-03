@@ -77,8 +77,8 @@ html, body {
 
 /* --- Header --- */
 #main-header {
-    background-color: var(--bg-primary);
-    padding: 0 24px;
+    background-color: #f3f5f4;
+    padding: 0 0 0 24px;
     border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
     position: relative;
@@ -101,8 +101,8 @@ html, body {
 }
 
 .logo-container {
-    height: 90px;
-    width: 90px;
+    height: 190px;
+    width: 190px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -644,12 +644,12 @@ html, body {
 @media (max-width: 768px) {
     #main-header {
         height: 90px;
-        padding: 0 16px;
+        padding: 0 0 0 16px;
     }
     
     .logo-container {
-        height: 70px;
-        width: 70px;
+        height: 90px;
+        width: 90px;
     }
     #main-logo-img {
         height: 100%;
