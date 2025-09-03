@@ -686,7 +686,7 @@ html, body {
     .message-container { max-width: 90%; }
     .message-bubble { padding: 10px 14px; font-size: 0.95rem; }
 
-    #chat-input-container { padding: 8px; gap: 8px; }
+    #chat-input-container { padding: 8px 12px; gap: 8px; }
     .chat-actions-left { gap: 4px; }
     #send-btn, #dictate-btn, #email-btn { width: 44px; height: 44px; font-size: 1.1rem; }
     #chat-input { padding: 8px 14px; }
