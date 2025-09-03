@@ -419,13 +419,6 @@ html, body {
     flex-shrink: 0;
 }
 
-.chat-actions-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
 #chat-input-wrapper {
     flex-grow: 1;
     display: flex;
@@ -507,7 +500,7 @@ html, body {
     border: 1px solid var(--border-color);
 }
 #dictate-btn:hover, #email-btn:hover {
-    background-color: var(--brand- pastel);
+    background-color: var(--brand-pastel);
     color: var(--brand-color);
     border-color: var(--brand-color);
 }
@@ -688,7 +681,6 @@ html, body {
     .message-bubble { padding: 10px 14px; font-size: 0.95rem; }
 
     #chat-input-container { padding: 8px 12px; gap: 8px; }
-    .chat-actions-left { gap: 4px; }
     #send-btn, #dictate-btn, #email-btn { width: 44px; height: 44px; font-size: 1.1rem; }
     #chat-input { padding: 8px 0 8px 14px; }
 }
