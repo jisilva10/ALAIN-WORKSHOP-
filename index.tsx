@@ -142,7 +142,7 @@ const sendBtn = document.getElementById('send-btn') as HTMLButtonElement;
 const mainContentDiv = document.getElementById('main-content') as HTMLDivElement;
 const dictateBtn = document.getElementById('dictate-btn') as HTMLButtonElement;
 const emailBtn = document.getElementById('email-btn') as HTMLButtonElement;
-const headerClickableArea = document.getElementById('header-clickable-area');
+const resetChatTrigger = document.getElementById('header-left');
 const resetChatModal = document.getElementById('reset-chat-modal');
 const confirmResetBtn = document.getElementById('confirm-reset-btn');
 const cancelResetBtn = document.getElementById('cancel-reset-btn');
@@ -246,10 +246,11 @@ async function generatePdfOfLastMessage() {
         const ratio = imgWidth / (pdfWidth - margin * 2);
         
         const addHeaderAndFooter = (pageNumber: number, totalPages: number) => {
-            const logoUrl = (document.getElementById('main-profektus-logo') as HTMLImageElement)?.src;
+            const logoUrl = (document.getElementById('main-logo-img') as HTMLImageElement)?.src;
             if (logoUrl) {
                 try {
-                    pdf.addImage(logoUrl, 'PNG', margin, 5, 20, 20);
+                    // FIX: Preserve logo aspect ratio (approx 0.7:1) to prevent distortion.
+                    pdf.addImage(logoUrl, 'PNG', margin, 5, 14, 20);
                 } catch(e) { console.error("Could not add logo to PDF", e); }
             }
             pdf.setFontSize(14);
@@ -876,7 +877,7 @@ function setupEventListeners() {
     chatInput?.addEventListener('input', handleChatInput);
     window.addEventListener('resize', setAppHeight);
 
-    headerClickableArea?.addEventListener('click', () => {
+    resetChatTrigger?.addEventListener('click', () => {
         resetChatModal?.classList.remove('hidden');
     });
 
