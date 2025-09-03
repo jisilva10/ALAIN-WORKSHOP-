@@ -1,12 +1,9 @@
-
-
-
-import { marked } from "marked";
-import DOMPurify from "dompurify";
-import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, GroundingMetadata } from "@google/genai";
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import emailjs from 'emailjs-com';
+import { marked } from "https://esm.sh/marked@^12.0.2";
+import DOMPurify from "https://esm.sh/dompurify@^3.0.8";
+import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, GroundingMetadata } from "https://esm.sh/@google/genai@^1.5.1";
+import jsPDF from 'https://esm.sh/jspdf@2.5.1';
+import html2canvas from 'https://esm.sh/html2canvas@1.4.1';
+import emailjs from 'https://esm.sh/@emailjs/browser@^4.3.3';
 
 const API_KEY = process.env.API_KEY;
 // --- EmailJS Configuration ---
@@ -94,8 +91,13 @@ You are a professional assistant, bringing the Profektus methodology for structu
 // Types for SpeechRecognition API
 declare var webkitSpeechRecognition: any;
 
-// Interface for storing content with potential grounding metadata
-interface StoredContent extends Content {
+// FIX: Redefined StoredContent to include `role` and `parts` directly.
+// The `Content` type from the imported library version seems to be missing these
+// properties, which are essential for chat history management in this application.
+// This change resolves multiple type errors related to creating and accessing chat messages.
+interface StoredContent {
+    role: 'user' | 'model';
+    parts: Part[];
     groundingMetadata?: GroundingMetadata;
 }
 
