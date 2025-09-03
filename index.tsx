@@ -142,7 +142,7 @@ const sendBtn = document.getElementById('send-btn') as HTMLButtonElement;
 const mainContentDiv = document.getElementById('main-content') as HTMLDivElement;
 const dictateBtn = document.getElementById('dictate-btn') as HTMLButtonElement;
 const emailBtn = document.getElementById('email-btn') as HTMLButtonElement;
-const resetChatTrigger = document.getElementById('header-left');
+const resetChatTrigger = document.getElementById('reset-chat-trigger');
 const resetChatModal = document.getElementById('reset-chat-modal');
 const confirmResetBtn = document.getElementById('confirm-reset-btn');
 const cancelResetBtn = document.getElementById('cancel-reset-btn');
@@ -496,7 +496,7 @@ async function copyTextToClipboard(text: string): Promise<boolean> {
         return true;
     } catch (err) {
         console.error('Failed to copy text: ', err);
-        alert('No se pudo copiar el texto al portapapeles.');
+        alert('No se pudo copiar el texto al portapeles.');
         return false;
     }
 }

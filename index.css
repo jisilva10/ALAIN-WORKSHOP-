@@ -94,6 +94,9 @@ html, body {
     display: flex;
     align-items: center;
     gap: 16px;
+}
+
+#reset-chat-trigger {
     cursor: pointer;
 }
 
@@ -132,7 +135,6 @@ html, body {
 #header-right-controls {
     display: flex;
     align-items: center;
-    gap: 16px;
 }
 
 /* --- Main Content & Chat Area --- */
