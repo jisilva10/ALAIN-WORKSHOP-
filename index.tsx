@@ -910,6 +910,16 @@ function setupEventListeners() {
             emailChatModal.classList.add('hidden');
         }
     });
+
+    document.addEventListener('click', (e) => {
+        // Hide action buttons if a click occurs outside of a message bubble.
+        // The bubble's own click handler will manage toggling visibility on.
+        if (!(e.target as HTMLElement).closest('.message-bubble')) {
+            document.querySelectorAll('.message-bubble.actions-visible').forEach(bubble => {
+                bubble.classList.remove('actions-visible');
+            });
+        }
+    });
 }
 
 function initializeChatSession() {

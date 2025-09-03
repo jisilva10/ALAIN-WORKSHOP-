@@ -72,10 +72,7 @@ html, body {
     flex-direction: column;
     height: var(--app-height);
     width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
     background-color: var(--bg-primary);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 /* --- Header --- */
