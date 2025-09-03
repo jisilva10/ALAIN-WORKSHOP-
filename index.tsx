@@ -677,7 +677,7 @@ async function sendPromptToAI(parts: Part[], userMessageId: string) {
         const stream = await currentChatSession.sendMessageStream({ message: parts });
 
         for await (const chunk of stream) {
-            fullResponseText += chunk.text;
+            fullResponseText += chunk.text || '';
             if (!groundingMetadata && chunk.candidates?.[0]?.groundingMetadata) {
                  groundingMetadata = chunk.candidates[0].groundingMetadata;
             }
