@@ -1,4 +1,5 @@
 
+
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
@@ -655,13 +656,17 @@ html, body {
         padding: 0 16px;
     }
     
+    .logo-container {
+        gap: 8px;
+    }
+    
     #logo-img-circle {
         height: 55px;
         width: 55px;
     }
 
     #logo-img-text {
-        display: none;
+        height: 55px;
     }
     
     .header-title span { font-size: 1.5rem; }
