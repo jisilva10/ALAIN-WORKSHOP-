@@ -326,24 +326,19 @@ html, body {
 /* --- Message Actions (Copy, Edit) --- */
 .message-actions {
     opacity: 0;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
     display: flex;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 8px;
     pointer-events: none;
+    transform: translateY(-4px);
 }
 
-.message-bubble:hover .message-actions,
-.message-bubble.actions-visible .message-actions {
+.message-container:hover .message-actions,
+.message-container.actions-visible .message-actions {
     opacity: 1;
     pointer-events: auto;
-}
-
-.message-container.user .message-actions {
-    align-self: flex-end;
-}
-.message-container.ai .message-actions {
-    align-self: flex-start;
+    transform: translateY(0);
 }
 
 .action-btn {

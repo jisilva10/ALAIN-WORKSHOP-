@@ -401,15 +401,15 @@ function renderMessages() {
                     return;
                 }
                 
-                // Close any other message bubbles that have actions visible
-                document.querySelectorAll('.message-bubble.actions-visible').forEach(otherBubble => {
-                    if (otherBubble !== messageBubble) {
-                        otherBubble.classList.remove('actions-visible');
+                // Close any other message containers that have actions visible
+                document.querySelectorAll('.message-container.actions-visible').forEach(otherContainer => {
+                    if (otherContainer !== messageContainer) {
+                        otherContainer.classList.remove('actions-visible');
                     }
                 });
         
-                // Toggle actions on the clicked bubble
-                messageBubble.classList.toggle('actions-visible');
+                // Toggle actions on the clicked bubble's container
+                messageContainer.classList.toggle('actions-visible');
             });
         }
 
@@ -466,12 +466,12 @@ function renderMessages() {
             copyBtn.onclick = (e) => handleCopyClick(e, message.id, message.text);
             messageActions.appendChild(copyBtn);
         }
-
-        if (messageActions.hasChildNodes()) {
-            messageBubble.appendChild(messageActions);
-        }
         
         messageContainer.appendChild(messageBubble);
+
+        if (messageActions.hasChildNodes()) {
+            messageContainer.appendChild(messageActions);
+        }
 
         chatMessagesDiv.appendChild(messageContainer);
     });
@@ -912,11 +912,10 @@ function setupEventListeners() {
     });
 
     document.addEventListener('click', (e) => {
-        // Hide action buttons if a click occurs outside of a message bubble.
-        // The bubble's own click handler will manage toggling visibility on.
-        if (!(e.target as HTMLElement).closest('.message-bubble')) {
-            document.querySelectorAll('.message-bubble.actions-visible').forEach(bubble => {
-                bubble.classList.remove('actions-visible');
+        // Hide action buttons if a click occurs outside of a message container.
+        if (!(e.target as HTMLElement).closest('.message-container')) {
+            document.querySelectorAll('.message-container.actions-visible').forEach(container => {
+                container.classList.remove('actions-visible');
             });
         }
     });
