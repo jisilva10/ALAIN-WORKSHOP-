@@ -131,10 +131,43 @@ html, body {
     margin: 0;
 }
 
+#header-right-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 #header-right-controls .header-logo-right {
     height: 44px;
     opacity: 0.9;
 }
+
+#header-right-controls #email-btn {
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#header-right-controls #email-btn:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--brand-color);
+    transform: none;
+}
+#header-right-controls #email-btn:disabled {
+    background-color: transparent;
+    color: var(--text-placeholder);
+    cursor: wait;
+}
+
 
 /* --- Main Content & Chat Area --- */
 #main-content {
@@ -175,7 +208,6 @@ html, body {
     display: flex;
     flex-direction: column;
     max-width: 85%;
-    position: relative;
 }
 
 .message-container.user {
@@ -205,10 +237,11 @@ html, body {
     border-radius: 20px;
     line-height: 1.6;
     font-size: 1rem;
-    position: relative;
     box-shadow: 0 3px 6px var(--shadow-color);
     transition: transform 0.2s ease;
-    margin-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
 }
 
 .message-container.user .message-bubble {
@@ -231,6 +264,7 @@ html, body {
     border-radius: 4px;
     box-shadow: none;
     margin-bottom: 0;
+    cursor: default;
 }
 .message-container.system .message-bubble {
     background-color: var(--system-message-bg);
@@ -294,16 +328,26 @@ html, body {
 
 /* --- Message Actions (Copy, Edit) --- */
 .message-actions {
-    position: absolute;
-    bottom: 0;
-    opacity: 1;
-    transition: transform 0.2s ease-in-out;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
     display: flex;
     gap: 8px;
+    margin-top: 12px;
+    pointer-events: none;
 }
 
-.message-container.user .message-actions { right: 10px; }
-.message-container.ai .message-actions { left: 10px; }
+.message-bubble:hover .message-actions,
+.message-bubble.actions-visible .message-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.message-container.user .message-actions {
+    align-self: flex-end;
+}
+.message-container.ai .message-actions {
+    align-self: flex-start;
+}
 
 .action-btn {
     background-color: var(--bg-primary);
@@ -419,7 +463,7 @@ html, body {
 #chat-input:focus { outline: none; }
 #chat-input::placeholder { color: var(--text-placeholder); }
 
-#send-btn, #dictate-btn, #email-btn {
+#send-btn, #dictate-btn {
     flex-shrink: 0; width: 48px; height: 48px; border-radius: 50%; border: none;
     display: flex; align-items: center; justify-content: center; cursor: pointer;
     transition: all 0.2s ease; font-size: 1.2rem;
@@ -428,26 +472,22 @@ html, body {
     box-shadow: 0 4px 10px rgba(0, 141, 153, 0.3);
 }
 
-#send-btn:hover, #dictate-btn:hover, #email-btn:hover { 
+#send-btn:hover, #dictate-btn:hover { 
     background-color: var(--brand-color-dark); 
     transform: scale(1.05);
     box-shadow: 0 6px 14px rgba(0, 141, 153, 0.35);
 }
 
-#send-btn:active, #dictate-btn:active, #email-btn:active {
+#send-btn:active, #dictate-btn:active {
     transform: scale(0.95);
     transition: transform 0.1s ease;
 }
 
-#send-btn:disabled, #dictate-btn:disabled, #email-btn:disabled {
+#send-btn:disabled, #dictate-btn:disabled {
     background-color: #B0BEC5; 
     cursor: not-allowed; 
     transform: none; 
     box-shadow: none;
-}
-
-#email-btn:disabled {
-    cursor: wait;
 }
 
 #dictate-btn.active { 
@@ -499,18 +539,31 @@ html, body {
 
 /* --- Responsive Design --- */
 @media (max-width: 600px) {
+    #main-header {
+        padding: 8px 12px;
+    }
     #app-main-title-header { font-size: 1rem; }
     #logo-container {
         width: 44px;
         height: 44px;
         margin-right: 10px;
     }
+    #header-right-controls {
+        gap: 8px;
+    }
     #header-right-controls .header-logo-right {
         height: 38px;
     }
+    #header-right-controls #email-btn {
+        width: 36px;
+        height: 36px;
+    }
+    #chat-messages {
+        padding: 16px;
+    }
     .message-bubble { font-size: 0.95rem; }
     #chat-input-container { padding: 8px; gap: 8px; }
-    #send-btn, #dictate-btn, #email-btn {
+    #send-btn, #dictate-btn {
         width: 44px;
         height: 44px;
         font-size: 1.1rem;

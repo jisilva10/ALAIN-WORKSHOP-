@@ -393,6 +393,26 @@ function renderMessages() {
         const messageBubble = document.createElement('div');
         messageBubble.className = 'message-bubble';
 
+        // Add click listener to toggle action buttons, but not for system/error messages
+        if (message.sender === 'user' || message.sender === 'ai') {
+            messageBubble.addEventListener('click', (e) => {
+                // Don't trigger if a button, link, or other interactive element inside the bubble was clicked.
+                if ((e.target as HTMLElement).closest('.message-actions, a, button')) {
+                    return;
+                }
+                
+                // Close any other message bubbles that have actions visible
+                document.querySelectorAll('.message-bubble.actions-visible').forEach(otherBubble => {
+                    if (otherBubble !== messageBubble) {
+                        otherBubble.classList.remove('actions-visible');
+                    }
+                });
+        
+                // Toggle actions on the clicked bubble
+                messageBubble.classList.toggle('actions-visible');
+            });
+        }
+
         const messageContent = document.createElement('div');
         messageContent.className = 'message-content';
         
