@@ -1,4 +1,5 @@
 
+
 import { marked } from "https://esm.sh/marked@^12.0.2";
 import DOMPurify from "https://esm.sh/dompurify@^3.0.8";
 import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, GroundingMetadata } from "https://esm.sh/@google/genai@^1.5.1";
@@ -947,6 +948,7 @@ function initializeApp() {
     initializeDictation();
     setupEventListeners();
     checkMicrophonePermission();
+    handleChatInput(); // Set initial height for the textarea
 }
 
 initializeApp();

@@ -32,9 +32,6 @@
                             <small>Workshop Assistant</small>
                         </div>
                     </div>
-                    <button id="email-btn" aria-label="Enviar conversación por correo" title="Enviar conversación por correo">
-                        <i class="fas fa-envelope"></i>
-                    </button>
                 </div>
                 <div id="header-right-controls">
                     <div class="logo-container">
@@ -47,11 +44,16 @@
                 <!-- Chat messages will be displayed here -->
             </div>
             <div id="chat-input-container">
-                <button id="dictate-btn" aria-label="Iniciar dictado por voz" title="Iniciar dictado por voz">
-                    <i class="fas fa-microphone"></i>
-                </button>
+                <div class="chat-actions-left">
+                    <button id="dictate-btn" aria-label="Iniciar dictado por voz" title="Iniciar dictado por voz">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button id="email-btn" aria-label="Enviar conversación por correo" title="Enviar conversación por correo">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                </div>
                 <div id="chat-input-wrapper">
-                    <textarea id="chat-input" placeholder="Escribe tu mensaje..." aria-label="Entrada de mensaje"></textarea>
+                    <textarea id="chat-input" placeholder="Escribe tu mensaje..." aria-label="Entrada de mensaje" rows="1"></textarea>
                 </div>
                 <button id="send-btn" aria-label="Enviar mensaje" title="Enviar mensaje">
                     <i class="fas fa-paper-plane"></i>
