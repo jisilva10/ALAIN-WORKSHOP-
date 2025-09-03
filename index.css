@@ -87,7 +87,7 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 90px;
+    height: 110px;
 }
 
 #header-left {
@@ -98,8 +98,8 @@ html, body {
 }
 
 .logo-container {
-    height: 70px;
-    width: 70px;
+    height: 90px;
+    width: 90px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -118,14 +118,14 @@ html, body {
 }
 
 .header-title span {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
     font-family: var(--font-secondary);
     color: var(--brand-color);
 }
 
 .header-title small {
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--text-secondary);
 }
 
@@ -641,13 +641,13 @@ html, body {
 /* --- Responsive Design --- */
 @media (max-width: 768px) {
     #main-header {
-        height: 70px;
+        height: 90px;
         padding: 0 16px;
     }
     
     .logo-container {
-        height: 60px;
-        width: 60px;
+        height: 70px;
+        width: 70px;
     }
     #main-logo-img {
         height: 100%;
@@ -655,8 +655,8 @@ html, body {
         object-fit: contain;
     }
     
-    .header-title span { font-size: 1.25rem; }
-    .header-title small { font-size: 0.75rem; }
+    .header-title span { font-size: 1.5rem; }
+    .header-title small { font-size: 0.875rem; }
 
     #chat-messages {
         padding: 16px 12px;
