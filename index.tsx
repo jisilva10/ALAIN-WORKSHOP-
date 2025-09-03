@@ -91,9 +91,6 @@ You are a professional assistant, bringing the Profektus methodology for structu
 `;
 
 
-// Types for SpeechRecognition API
-declare var webkitSpeechRecognition: any;
-
 // FIX: Redefined StoredContent to include `role` and `parts` directly.
 // The `Content` type from the imported library version seems to be missing these
 // properties, which are essential for chat history management in this application.
@@ -132,16 +129,12 @@ let chatSessionMessages: StoredContent[] = [];
 let uiMessages: Message[] = [];
 let isLoading = false;
 let editingMessageId: string | null = null;
-let isDictating = false;
-let recognition: any = null;
-const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
 // --- START DOM SELECTORS ---
 const chatMessagesDiv = document.getElementById('chat-messages') as HTMLDivElement;
 const chatInput = document.getElementById('chat-input') as HTMLTextAreaElement;
 const sendBtn = document.getElementById('send-btn') as HTMLButtonElement;
 const mainContentDiv = document.getElementById('main-content') as HTMLDivElement;
-const dictateBtn = document.getElementById('dictate-btn') as HTMLButtonElement;
 const emailBtn = document.getElementById('email-btn') as HTMLButtonElement;
 const resetChatTrigger = document.getElementById('reset-chat-trigger');
 const resetChatModal = document.getElementById('reset-chat-modal');
@@ -224,7 +217,6 @@ async function generatePdfOfLastMessage() {
     isLoading = true;
     sendBtn.disabled = true;
     chatInput.disabled = true;
-    dictateBtn.disabled = true;
     emailBtn.disabled = true;
     sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
@@ -295,7 +287,6 @@ async function generatePdfOfLastMessage() {
         isLoading = false;
         sendBtn.disabled = false;
         chatInput.disabled = false;
-        dictateBtn.disabled = false;
         emailBtn.disabled = false;
         sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
     }
@@ -631,21 +622,6 @@ function finalizeAIMessage(aiMessage: Message, groundingMetadata?: GroundingMeta
     saveClientChat();
 }
 
-async function checkMicrophonePermission() {
-    if (!navigator.permissions) return;
-    try {
-        const permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-        dictateBtn.disabled = permissionStatus.state === 'denied';
-        dictateBtn.title = permissionStatus.state === 'denied' ? 'Permiso de micrófono bloqueado' : 'Iniciar dictado';
-        permissionStatus.onchange = () => {
-            dictateBtn.disabled = permissionStatus.state === 'denied';
-            dictateBtn.title = permissionStatus.state === 'denied' ? 'Permiso de micrófono bloqueado' : 'Iniciar dictado';
-        };
-    } catch (e) {
-        console.error("Could not query microphone permission:", e);
-    }
-}
-
 function loadAndRenderChat() {
     uiMessages = [];
     chatSessionMessages.forEach(contentItem => {
@@ -723,7 +699,6 @@ async function sendPromptToAI(parts: Part[], userMessageId: string) {
     } finally {
         isLoading = false;
         sendBtn.disabled = false;
-        dictateBtn.disabled = false;
         emailBtn.disabled = false;
         const finalAiMessageIndex = uiMessages.findIndex(m => m.id === aiMessageId);
         if (finalAiMessageIndex !== -1) {
@@ -772,7 +747,6 @@ async function handleSendMessage() {
     
     isLoading = true;
     sendBtn.disabled = true;
-    dictateBtn.disabled = true;
     emailBtn.disabled = true;
 
     const userMessageId = `user-${Date.now()}`;
@@ -814,58 +788,6 @@ function handleResetChat() {
 }
 
 // --- END Chat Logic and State Management ---
-
-function initializeDictation() {
-    if (!SpeechRecognition) {
-        dictateBtn.style.display = 'none';
-        return;
-    }
-
-    recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'es-US';
-
-    recognition.onstart = () => {
-        isDictating = true;
-        dictateBtn.classList.add('active');
-        dictateBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-        dictateBtn.title = 'Detener dictado';
-    };
-
-    recognition.onend = () => {
-        isDictating = false;
-        dictateBtn.classList.remove('active');
-        dictateBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-        dictateBtn.title = 'Iniciar dictado por voz';
-        handleChatInput();
-    };
-
-    recognition.onerror = (event: any) => console.error('Speech recognition error:', event.error);
-
-    let final_transcript = chatInput.value;
-    recognition.onresult = (event: any) => {
-        let interim_transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                final_transcript += event.results[i][0].transcript;
-            } else {
-                interim_transcript += event.results[i][0].transcript;
-            }
-        }
-        chatInput.value = final_transcript + interim_transcript;
-        handleChatInput();
-    };
-
-    dictateBtn.addEventListener('click', () => {
-        if (isDictating) {
-            recognition.stop();
-        } else {
-            final_transcript = chatInput.value ? chatInput.value + ' ' : '';
-            recognition.start();
-        }
-    });
-}
 
 function setupEventListeners() {
     sendBtn?.addEventListener('click', handleSendMessage);
@@ -945,9 +867,7 @@ function initializeApp() {
     setAppHeight();
     loadClientChat();
     loadAndRenderChat();
-    initializeDictation();
     setupEventListeners();
-    checkMicrophonePermission();
     handleChatInput(); // Set initial height for the textarea
 }
 
