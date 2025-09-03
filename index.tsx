@@ -8,8 +8,8 @@ import emailjs from 'https://esm.sh/@emailjs/browser@^4.3.3';
 
 const API_KEY = process.env.API_KEY;
 // --- EmailJS Configuration ---
-const EMAILJS_SERVICE_ID = 'Jose Silva';
-const EMAILJS_TEMPLATE_ID = 'template_trj2bdg';
+const EMAILJS_SERVICE_ID = 'MAIL GABI';
+const EMAILJS_TEMPLATE_ID = 'template_dtpxydm';
 const EMAILJS_PUBLIC_KEY = 'n87krczffWiWIh4zc'; // Public Key provided by user.
 
 // Initialize EmailJS

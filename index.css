@@ -78,7 +78,7 @@ html, body {
 /* --- Header --- */
 #main-header {
     background-color: #f3f5f4;
-    padding: 0 0 0 24px;
+    padding: 0 24px;
     border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
     position: relative;
@@ -101,16 +101,24 @@ html, body {
 }
 
 .logo-container {
-    height: 180px;
-    width: 250px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    gap: 16px;
 }
 
-#main-logo-img {
-    height: 100%;
-    width: 100%;
+#logo-img-circle {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    border: 3px solid var(--brand-color);
+    background-image: url('https://i.imgur.com/H3Bl5Vs.png');
+    background-size: auto 120%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#logo-img-text {
+    height: 100px;
     object-fit: contain;
 }
 
@@ -490,7 +498,7 @@ html, body {
     border: 1px solid var(--border-color);
 }
 #dictate-btn:hover, #email-btn:hover {
-    background-color: var(--brand-pastel);
+    background-color: var(--brand- pastel);
     color: var(--brand-color);
     border-color: var(--brand-color);
 }
@@ -644,17 +652,16 @@ html, body {
 @media (max-width: 768px) {
     #main-header {
         height: 90px;
-        padding: 0 0 0 16px;
+        padding: 0 16px;
     }
     
-    .logo-container {
-        height: 90px;
-        width: 90px;
+    #logo-img-circle {
+        height: 55px;
+        width: 55px;
     }
-    #main-logo-img {
-        height: 100%;
-        width: 100%;
-        object-fit: contain;
+
+    #logo-img-text {
+        display: none;
     }
     
     .header-title span { font-size: 1.5rem; }
