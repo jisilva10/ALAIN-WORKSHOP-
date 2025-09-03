@@ -569,7 +569,7 @@ body {
     opacity: 0.8;
 }
 
-#send-btn, #dictate-btn {
+#send-btn, #dictate-btn, #email-btn {
     background-color: var(--bg-brand-button);
     color: var(--text-on-brand);
     border: none;
@@ -585,17 +585,17 @@ body {
     transition: background-color 0.2s, transform 0.1s;
 }
 
-#send-btn:hover, #dictate-btn:hover:not(:disabled) {
+#send-btn:hover, #dictate-btn:hover:not(:disabled), #email-btn:hover:not(:disabled) {
     background-color: var(--bg-brand-button-hover);
 }
-#send-btn:active, #dictate-btn:active {
+#send-btn:active, #dictate-btn:active, #email-btn:active {
     transform: scale(0.95);
 }
 
 #dictate-btn.active {
     background-color: var(--bg-danger-button);
 }
-#dictate-btn:disabled {
+#dictate-btn:disabled, #email-btn:disabled {
     background-color: var(--bg-tertiary);
     color: var(--text-secondary);
     cursor: not-allowed;

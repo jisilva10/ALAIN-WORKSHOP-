@@ -1,10 +1,25 @@
+
+
+
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, GroundingMetadata } from "@google/genai";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import emailjs from 'emailjs-com';
 
 const API_KEY = process.env.API_KEY;
+// --- EmailJS Configuration ---
+const EMAILJS_SERVICE_ID = 'Jose Silva';
+const EMAILJS_TEMPLATE_ID = 'template_trj2bdg';
+const EMAILJS_PUBLIC_KEY = 'n87krczffWiWIh4zc'; // Public Key provided by user.
+
+// Initialize EmailJS
+if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
+    // FIX: Corrected emailjs.init call. It expects the public key string directly, not an object.
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+}
+
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 const MODEL_NAME = 'gemini-2.5-flash';
@@ -122,10 +137,14 @@ const chatInput = document.getElementById('chat-input') as HTMLTextAreaElement;
 const sendBtn = document.getElementById('send-btn') as HTMLButtonElement;
 const mainContentDiv = document.getElementById('main-content') as HTMLDivElement;
 const dictateBtn = document.getElementById('dictate-btn') as HTMLButtonElement;
+const emailBtn = document.getElementById('email-btn') as HTMLButtonElement;
 const headerClickableArea = document.getElementById('header-clickable-area');
 const resetChatModal = document.getElementById('reset-chat-modal');
 const confirmResetBtn = document.getElementById('confirm-reset-btn');
 const cancelResetBtn = document.getElementById('cancel-reset-btn');
+const emailChatModal = document.getElementById('email-chat-modal');
+const confirmEmailBtn = document.getElementById('confirm-email-btn');
+const cancelEmailBtn = document.getElementById('cancel-email-btn');
 // --- END DOM SELECTORS ---
 
 // --- START Helper Functions ---
@@ -148,6 +167,16 @@ function cleanTextForApiHistory(text: string): string {
     if (!text) return '';
     return text
         .replace(fuentesParaImagenesRegexGlobal, '')
+        .trim();
+}
+
+function cleanMarkdownForEmail(text: string): string {
+    if (!text) return '';
+    return text
+        // Remove heading markers like ##, ###, etc. at the start of a line
+        .replace(/^[#]+\s+/gm, '')
+        // Remove bold markers surrounding text
+        .replace(/\*\*(.*?)\*\*/g, '$1')
         .trim();
 }
 // --- END Helper Functions ---
@@ -190,6 +219,8 @@ async function generatePdfOfLastMessage() {
     isLoading = true;
     sendBtn.disabled = true;
     chatInput.disabled = true;
+    dictateBtn.disabled = true;
+    emailBtn.disabled = true;
     sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
     const lastAiMessageElement = aiMessages[aiMessages.length - 1] as HTMLElement;
@@ -258,9 +289,61 @@ async function generatePdfOfLastMessage() {
         isLoading = false;
         sendBtn.disabled = false;
         chatInput.disabled = false;
+        dictateBtn.disabled = false;
+        emailBtn.disabled = false;
         sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
     }
 }
+
+async function handleSendEmail() {
+    // FIX: Check for truthiness of EmailJS config variables instead of comparing against placeholder strings.
+    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+        addMessageToChat('error', 'La función de envío de correo no está configurada. Faltan el Service ID y/o el Template ID de EmailJS. Por favor, contacta al administrador.');
+        return;
+    }
+
+    const messagesToSend = uiMessages.filter(message => message.sender === 'user' || message.sender === 'ai');
+    if (messagesToSend.length === 0) {
+        addMessageToChat('system', 'No hay ninguna conversación para enviar.');
+        return;
+    }
+
+    // Show loading state in UI
+    emailBtn.disabled = true;
+    emailBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    try {
+        const header = "Historial de conversación con A'LAIN\n====================================\n\n";
+        const conversationText = messagesToSend.map(message => {
+            const sender = message.sender === 'user' ? '👤 Tú' : '🤖 A’LAIN';
+            const timestamp = message.timestamp.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'medium' });
+            const cleanedText = cleanMarkdownForEmail(message.text);
+            return `[${timestamp}] ${sender}:\n${cleanedText}`;
+        }).join('\n\n---\n\n');
+
+        const fullTextToSend = header + conversationText;
+
+        const templateParams = {
+            to_email: 'jisignacio10@gmail.com', // Hardcoded as requested
+            subject: "Conversación con A'LAIN",
+            message: fullTextToSend,
+        };
+
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+
+        addMessageToChat('system', '✅ ¡Conversación enviada con éxito a Profektus!');
+    
+    } catch (error) {
+        console.error("Error sending email with EmailJS:", error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        addMessageToChat('error', `Ocurrió un error al enviar la conversación. Por favor, intenta de nuevo más tarde. Error: ${errorMessage}`);
+    } finally {
+        // Restore button state
+        emailBtn.disabled = false;
+        emailBtn.innerHTML = '<i class="fas fa-envelope"></i>';
+    }
+}
+
 
 function handleChatInput() {
     if (!chatInput) return;
@@ -613,6 +696,9 @@ async function sendPromptToAI(parts: Part[], userMessageId: string) {
         }
     } finally {
         isLoading = false;
+        sendBtn.disabled = false;
+        dictateBtn.disabled = false;
+        emailBtn.disabled = false;
         const finalAiMessageIndex = uiMessages.findIndex(m => m.id === aiMessageId);
         if (finalAiMessageIndex !== -1) {
             const finalMessage = uiMessages[finalAiMessageIndex];
@@ -659,6 +745,9 @@ async function handleSendMessage() {
     if (!promptText) return;
     
     isLoading = true;
+    sendBtn.disabled = true;
+    dictateBtn.disabled = true;
+    emailBtn.disabled = true;
 
     const userMessageId = `user-${Date.now()}`;
     const parts: Part[] = [];
@@ -778,33 +867,52 @@ function setupEventListeners() {
             resetChatModal.classList.add('hidden');
         }
     });
+
+    emailBtn?.addEventListener('click', () => {
+        emailChatModal?.classList.remove('hidden');
+    });
+
+    cancelEmailBtn?.addEventListener('click', () => {
+        emailChatModal?.classList.add('hidden');
+    });
+
+    confirmEmailBtn?.addEventListener('click', () => {
+        emailChatModal?.classList.add('hidden');
+        handleSendEmail();
+    });
+
+    emailChatModal?.addEventListener('click', (e) => {
+        if (e.target === emailChatModal) {
+            emailChatModal.classList.add('hidden');
+        }
+    });
 }
 
 function initializeChatSession() {
     const apiHistory: Content[] = chatSessionMessages.map(contentItem => ({
         role: contentItem.role,
-        parts: [{ text: cleanTextForApiHistory((contentItem.parts[0] as Part).text || '') }]
-    })).filter(item => (item.parts[0] as Part)?.text?.trim() !== '');
+        parts: contentItem.parts.map(part => ({
+            text: cleanTextForApiHistory(part.text)
+        }))
+    }));
 
     currentChatSession = ai.chats.create({
         model: MODEL_NAME,
-        history: apiHistory,
         config: {
-            systemInstruction: ALAIN_CLIENT_SYSTEM_INSTRUCTION,
-            tools: [{ googleSearch: {} }]
-        }
+            systemInstruction: ALAIN_CLIENT_SYSTEM_INSTRUCTION
+        },
+        history: apiHistory
     });
 }
 
-// --- START App Initialization ---
+
 function initializeApp() {
     setAppHeight();
     loadClientChat();
     loadAndRenderChat();
-    setupEventListeners();
     initializeDictation();
+    setupEventListeners();
     checkMicrophonePermission();
 }
 
 initializeApp();
-// --- END App Initialization ---

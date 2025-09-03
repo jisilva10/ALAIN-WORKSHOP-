@@ -14,7 +14,8 @@
     "marked": "https://esm.sh/marked@^12.0.2",
     "dompurify": "https://esm.sh/dompurify@^3.0.8",
     "jspdf": "https://esm.sh/jspdf@2.5.1",
-    "html2canvas": "https://esm.sh/html2canvas@1.4.1"
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+    "emailjs-com": "https://esm.sh/@emailjs/browser@^4.3.3"
   }
 }
 </script>
@@ -44,6 +45,9 @@
                 <button id="dictate-btn" aria-label="Iniciar dictado por voz" title="Iniciar dictado por voz">
                     <i class="fas fa-microphone"></i>
                 </button>
+                <button id="email-btn" aria-label="Enviar conversación por correo" title="Enviar conversación por correo">
+                    <i class="fas fa-envelope"></i>
+                </button>
                 <div id="chat-input-wrapper">
                     <textarea id="chat-input" placeholder="Escribe tu mensaje..." aria-label="Entrada de mensaje"></textarea>
                 </div>
@@ -61,6 +65,21 @@
             <div class="modal-actions">
                 <button id="cancel-reset-btn" class="secondary-btn">Cancelar</button>
                 <button id="confirm-reset-btn" class="danger-btn">Sí, reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="email-chat-modal" class="modal-container hidden">
+        <div class="modal-content">
+            <h2>Enviar Conversación a Profektus</h2>
+            <p>
+                Esto enviará un registro completo de tu conversación al equipo de Profektus para su análisis y mejora.
+                <br><br>
+                ¿Estás de acuerdo en continuar?
+            </p>
+            <div class="modal-actions">
+                <button id="cancel-email-btn" class="secondary-btn">Cancelar</button>
+                <button id="confirm-email-btn" class="primary-btn">Sí, enviar</button>
             </div>
         </div>
     </div>
