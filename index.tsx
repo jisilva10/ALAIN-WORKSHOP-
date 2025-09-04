@@ -842,9 +842,8 @@ function setupEventListeners() {
 
     chatInput?.addEventListener('blur', () => {
         // When the input loses focus (keyboard hides), recalculate the app height
-        // to restore the full viewport. Also, reset any page scroll.
+        // to restore the full viewport.
         setAppHeight();
-        window.scrollTo(0, 0);
     });
     // --- END: Mobile keyboard fix ---
 
