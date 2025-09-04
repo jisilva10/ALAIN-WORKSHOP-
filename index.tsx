@@ -5,7 +5,7 @@ import DOMPurify from "https://esm.sh/dompurify@^3.0.8";
 import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, GroundingMetadata } from "https://esm.sh/@google/genai@^1.5.1";
 import jsPDF from 'https://esm.sh/jspdf@2.5.1';
 import html2canvas from 'https://esm.sh/html2canvas@1.4.1';
-import emailjs from 'https://esm.sh/@emailjs/browser@^4.3.3';
+import emailjs from '@emailjs/browser';
 
 const API_KEY = process.env.API_KEY;
 // --- EmailJS Configuration ---
@@ -293,9 +293,8 @@ async function generatePdfOfLastMessage() {
 }
 
 async function handleSendEmail() {
-    // FIX: Check for truthiness of EmailJS config variables instead of comparing against placeholder strings.
     if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-        addMessageToChat('error', 'La función de envío de correo no está configurada. Faltan el Service ID y/o el Template ID de EmailJS. Por favor, contacta al administrador.');
+        addMessageToChat('error', 'La función de envío de correo no está configurada. Por favor, contacta al administrador.');
         return;
     }
 
@@ -305,37 +304,67 @@ async function handleSendEmail() {
         return;
     }
 
-    // Show loading state in UI
     emailBtn.disabled = true;
     emailBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
+    // Prepare full conversation text
+    const messageStrings = messagesToSend.map(message => {
+        const sender = message.sender === 'user' ? '👤 Tú' : '🤖 A’LAIN';
+        const timestamp = message.timestamp.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'medium' });
+        const cleanedText = cleanMarkdownForEmail(message.text);
+        return `[${timestamp}] ${sender}:\n${cleanedText}`;
+    });
+    
+    const header = "Historial de conversación con A'LAIN\n====================================\n\n";
+    const separator = '\n\n---\n\n';
+    const conversationText = messageStrings.join(separator);
+    const fullTextToSend = header + conversationText;
+
     try {
-        const header = "Historial de conversación con A'LAIN\n====================================\n\n";
-        const conversationText = messagesToSend.map(message => {
-            const sender = message.sender === 'user' ? '👤 Tú' : '🤖 A’LAIN';
-            const timestamp = message.timestamp.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'medium' });
-            const cleanedText = cleanMarkdownForEmail(message.text);
-            return `[${timestamp}] ${sender}:\n${cleanedText}`;
-        }).join('\n\n---\n\n');
-
-        const fullTextToSend = header + conversationText;
-
+        // Attempt 1: Send the full conversation
         const templateParams = {
             to_email: 'jisignacio10@gmail.com', // Hardcoded as requested
             subject: "Conversación con A'LAIN",
             message: fullTextToSend,
         };
-
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-
         addMessageToChat('system', '✅ ¡Conversación enviada con éxito a Profektus!');
-    
-    } catch (error) {
-        console.error("Error sending email with EmailJS:", error);
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        addMessageToChat('error', `Ocurrió un error al enviar la conversación. Por favor, intenta de nuevo más tarde. Error: ${errorMessage}`);
+    } catch (initialError: any) {
+        console.warn("Initial email attempt failed, likely due to size. Attempting to send summary.", initialError);
+        addMessageToChat('system', 'El envío completo falló, probablemente por el tamaño. Generando y enviando un resumen...');
+
+        try {
+            // Attempt 2: Generate and send a summary
+            const conversationForSummary = messagesToSend.map(message => {
+                const sender = message.sender === 'user' ? 'Usuario' : 'A’LAIN';
+                return `${sender}: "${cleanMarkdownForEmail(message.text)}"`;
+            }).join('\n');
+
+            const summaryPrompt = `Por favor, crea un resumen detallado y específico de la siguiente conversación entre un Usuario y el asistente A'LAIN. El resumen debe ser extenso y cubrir los siguientes puntos en detalle: 1. El problema o consulta inicial del usuario. 2. Los puntos clave, ideas y soluciones discutidas durante la conversación. 3. Las preguntas más importantes realizadas por el usuario y las respuestas correspondientes de A'LAIN. 4. Las conclusiones finales, los acuerdos o los próximos pasos definidos. El objetivo es que una persona que lea el resumen tenga una comprensión completa y profunda de toda la interacción, sin omitir detalles importantes. No te limites en la extensión, la especificidad es la prioridad.\n\n--- INICIO DE LA CONVERSACIÓN ---\n${conversationForSummary}\n--- FIN DE LA CONVERSACIÓN ---`;
+            
+            const summaryResponse = await ai.models.generateContent({
+                model: MODEL_NAME,
+                contents: summaryPrompt,
+            });
+
+            const summaryText = summaryResponse.text;
+            const summarizedMessage = `${header}\n**La conversación original era demasiado larga para ser enviada. A continuación se presenta un resumen generado por IA:**\n\n---\n\n${summaryText}`;
+            
+            const summaryTemplateParams = {
+                to_email: 'jisignacio10@gmail.com',
+                subject: "Conversación con A'LAIN (Resumen)",
+                message: summarizedMessage,
+            };
+
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, summaryTemplateParams);
+            addMessageToChat('system', '✅ ¡Resumen de la conversación enviado con éxito a Profektus!');
+
+        } catch (summaryError: any) {
+            console.error("Error sending summary email:", summaryError);
+            const errorMessage = summaryError?.text || (summaryError instanceof Error ? summaryError.message : 'Ocurrió un error desconocido.');
+            addMessageToChat('error', `El envío del resumen también falló. Por favor, intenta de nuevo más tarde. Error: ${errorMessage}`);
+        }
     } finally {
-        // Restore button state
         emailBtn.disabled = false;
         emailBtn.innerHTML = '<i class="fas fa-envelope"></i>';
     }
