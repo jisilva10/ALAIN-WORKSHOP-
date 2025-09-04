@@ -829,6 +829,25 @@ function setupEventListeners() {
     chatInput?.addEventListener('input', handleChatInput);
     window.addEventListener('resize', setAppHeight);
 
+    // --- START: Mobile keyboard fix ---
+    // Handle the appearance and disappearance of the virtual keyboard on mobile devices,
+    // which can cause layout issues with viewport height.
+    chatInput?.addEventListener('focus', () => {
+        // A short delay after focus helps ensure the view scrolls to the bottom
+        // after the keyboard has finished animating into view.
+        setTimeout(() => {
+            if (chatMessagesDiv) chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        }, 150);
+    });
+
+    chatInput?.addEventListener('blur', () => {
+        // When the input loses focus (keyboard hides), recalculate the app height
+        // to restore the full viewport. Also, reset any page scroll.
+        setAppHeight();
+        window.scrollTo(0, 0);
+    });
+    // --- END: Mobile keyboard fix ---
+
     resetChatTrigger?.addEventListener('click', () => {
         resetChatModal?.classList.remove('hidden');
     });

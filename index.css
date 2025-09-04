@@ -67,7 +67,6 @@ html, body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     /* Prevent mobile overscroll/bounce effect */
-    position: fixed;
     overscroll-behavior: none;
 }
 
