@@ -146,6 +146,13 @@ const cancelEmailBtn = document.getElementById('cancel-email-btn');
 // --- END DOM SELECTORS ---
 
 // --- START Helper Functions ---
+function setAppHeight() {
+    // This function sets the app's height based on the browser's inner window height.
+    // It's a more reliable way to handle the viewport on mobile devices, especially
+    // when the virtual keyboard appears and disappears, compared to pure CSS solutions like '100vh'.
+    document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+}
+
 function escapeHtml(unsafe: string): string {
     if (!unsafe) return '';
     return unsafe
@@ -623,27 +630,6 @@ function renderEditForm(message: Message) {
 }
 // --- END Edit & Copy functions ---
 
-// --- START Dynamic Viewport Height ---
-function setupViewportHandling() {
-    const setHeight = () => {
-        // visualViewport gives the height of the layout viewport minus UI like the virtual keyboard.
-        const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-        document.documentElement.style.setProperty('--app-height', `${vh}px`);
-    };
-
-    // Set height on initial load and whenever the viewport is resized (e.g., keyboard open/close)
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', setHeight);
-    } else {
-        // Fallback for browsers that don't support visualViewport
-        window.addEventListener('resize', setHeight);
-    }
-
-    // Call it once to set initial height
-    setHeight();
-}
-// --- END Dynamic Viewport Height ---
-
 // --- START Chat Logic and State Management ---
 
 function addMessageToChat(
@@ -843,18 +829,26 @@ function setupEventListeners() {
     });
     chatInput?.addEventListener('input', handleChatInput);
 
-    // --- START: Mobile keyboard fix ---
-    // The visualViewport API handles height adjustments automatically.
-    // We only need to ensure the view scrolls to the bottom when the input is focused.
+    // --- START: Mobile keyboard & viewport fix ---
+    // This block replaces the previous complex/buggy implementation with a more robust
+    // and widely compatible method using window.innerHeight.
+    
+    // Set the height when the app loads and whenever the window is resized (e.g., orientation change).
+    window.addEventListener('resize', setAppHeight);
+
+    // When the input is focused, wait for the keyboard to appear, then scroll the chat into view.
     chatInput?.addEventListener('focus', () => {
-        // A short delay after focus helps ensure the view scrolls to the bottom
-        // after the keyboard has finished animating into view.
         setTimeout(() => {
             if (chatMessagesDiv) chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-        }, 150);
+        }, 250);
     });
-    // The blur event handler is no longer needed as visualViewport handles it.
-    // --- END: Mobile keyboard fix ---
+    
+    // When the input is blurred (keyboard hides), wait for the animation to finish, then resize the app.
+    // This is the core fix for the "stuck" input bar.
+    chatInput?.addEventListener('blur', () => {
+        setTimeout(setAppHeight, 100);
+    });
+    // --- END: Mobile keyboard & viewport fix ---
 
     resetChatTrigger?.addEventListener('click', () => {
         resetChatModal?.classList.remove('hidden');
@@ -920,7 +914,7 @@ function initializeChatSession() {
 
 
 function initializeApp() {
-    setupViewportHandling();
+    setAppHeight(); // Set initial height on load
     loadClientChat();
     loadAndRenderChat();
     setupEventListeners();
