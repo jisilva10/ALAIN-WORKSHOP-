@@ -66,6 +66,9 @@ html, body {
     background-color: var(--bg-secondary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Prevent mobile overscroll/bounce effect */
+    position: fixed;
+    overscroll-behavior: none;
 }
 
 #app-container {
