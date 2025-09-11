@@ -1,7 +1,18 @@
-
-
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes tada {
+    0% { transform: scale(1); }
+    10%, 20% { transform: scale(0.9) rotate(-3deg); }
+    30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+    40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+    100% { transform: scale(1) rotate(0); }
+}
 
 @keyframes wobble {
     0% { transform: rotate(0deg) scale(1); }
@@ -11,6 +22,13 @@
     60% { transform: rotate(2deg) scale(1.05); }
     75% { transform: rotate(-1deg) scale(1.05); }
     100% { transform: rotate(0deg) scale(1); }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 
 :root {
@@ -77,6 +95,131 @@ html, body {
     width: 100%;
     background-color: var(--bg-primary);
 }
+
+#app-container.fade-in {
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+
+/* --- Password Overlay --- */
+#password-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 16px;
+    transition: opacity 0.5s ease;
+}
+
+#password-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#password-box {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 32px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    border-top: 4px solid var(--brand-color);
+}
+
+#password-box.shake {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+#password-box h2 {
+    margin-top: 0;
+    font-family: var(--font-secondary);
+    color: var(--text-primary);
+    font-size: 1.8rem;
+}
+
+#password-box p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+#password-box .modal-image {
+    max-width: 180px;
+    margin-bottom: 20px;
+}
+
+#password-box .modal-image.success {
+    animation: tada 1s ease;
+}
+
+.password-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+#password-input {
+    width: 100%;
+    padding: 14px 48px 14px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+#password-input:focus {
+    outline: none;
+    border-color: var(--brand-color);
+    box-shadow: 0 0 0 3px var(--brand-pastel);
+}
+
+#toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-placeholder);
+    transition: color 0.2s ease;
+}
+
+#toggle-password:hover {
+    color: var(--text-primary);
+}
+
+#password-submit-btn {
+    width: 100%;
+}
+
+#password-error {
+    color: var(--danger-color);
+    font-weight: 500;
+    min-height: 1.2em; /* Prevent layout shift */
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+#password-error:not(.hidden) {
+    opacity: 1;
+}
+
 
 /* --- Header --- */
 #main-header {
@@ -425,7 +568,7 @@ html, body {
     flex-grow: 1;
     display: flex;
     align-items: flex-end;
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-primary);
     border-radius: 24px;
     border: 1px solid var(--border-color);
     padding: 4px 8px;
@@ -587,6 +730,9 @@ html, body {
 .modal-image {
     max-width: 120px;
     margin-bottom: 20px;
+}
+
+#email-chat-modal .modal-image {
     animation: wobble 1.5s ease-in-out infinite;
 }
 
@@ -673,6 +819,18 @@ html, body {
     #chat-input-container { padding: 8px 12px; gap: 8px; }
     #send-btn, #email-btn { width: 44px; height: 44px; font-size: 1.1rem; }
     #chat-input { padding: 8px 0 8px 14px; }
+}
+
+@media (max-width: 480px) {
+    #password-box {
+        padding: 24px;
+    }
+    #password-box h2 {
+        font-size: 1.5rem;
+    }
+    #password-box .modal-image {
+        max-width: 140px;
+    }
 }
 
 /* --- Orientation Lock --- */

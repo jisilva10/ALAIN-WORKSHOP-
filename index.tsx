@@ -1,5 +1,3 @@
-
-
 import { marked } from "https://esm.sh/marked@^12.0.2";
 import DOMPurify from "https://esm.sh/dompurify@^3.0.8";
 import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, GroundingMetadata } from "https://esm.sh/@google/genai@^1.5.1";
@@ -7,7 +5,10 @@ import jsPDF from 'https://esm.sh/jspdf@2.5.1';
 import html2canvas from 'https://esm.sh/html2canvas@1.4.1';
 import emailjs from '@emailjs/browser';
 
+// --- Easily Editable Access Key ---
+const ACCESS_KEY = 'PROFEKTUS2025';
 const API_KEY = process.env.API_KEY;
+
 // --- EmailJS Configuration ---
 const EMAILJS_SERVICE_ID = 'MAIL GABI';
 const EMAILJS_TEMPLATE_ID = 'template_dtpxydm';
@@ -143,6 +144,14 @@ const cancelResetBtn = document.getElementById('cancel-reset-btn');
 const emailChatModal = document.getElementById('email-chat-modal');
 const confirmEmailBtn = document.getElementById('confirm-email-btn');
 const cancelEmailBtn = document.getElementById('cancel-email-btn');
+// --- Password Auth Selectors ---
+const passwordOverlay = document.getElementById('password-overlay') as HTMLDivElement;
+const passwordInput = document.getElementById('password-input') as HTMLInputElement;
+const passwordSubmitBtn = document.getElementById('password-submit-btn') as HTMLButtonElement;
+const passwordError = document.getElementById('password-error') as HTMLParagraphElement;
+const passwordBox = document.getElementById('password-box') as HTMLDivElement;
+const appContainer = document.getElementById('app-container') as HTMLDivElement;
+const togglePassword = document.getElementById('toggle-password') as HTMLElement;
 // --- END DOM SELECTORS ---
 
 // --- START Helper Functions ---
@@ -921,4 +930,74 @@ function initializeApp() {
     handleChatInput(); // Set initial height for the textarea
 }
 
-initializeApp();
+// --- START Authentication Logic ---
+
+function handlePasswordSubmit() {
+    if (passwordSubmitBtn?.disabled) return;
+
+    if (passwordInput.value.trim() === ACCESS_KEY) {
+        const modalImage = document.querySelector('#password-box .modal-image');
+        if (modalImage) {
+            modalImage.classList.add('success');
+        }
+
+        if (passwordInput) passwordInput.disabled = true;
+        if (passwordSubmitBtn) {
+            passwordSubmitBtn.disabled = true;
+            passwordSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Entrando...';
+        }
+
+        setTimeout(() => {
+            if (passwordOverlay) passwordOverlay.classList.add('fade-out');
+        }, 600);
+
+        setTimeout(() => {
+            if (passwordOverlay) passwordOverlay.style.display = 'none';
+            if (appContainer) {
+                appContainer.style.display = 'flex';
+                appContainer.classList.add('fade-in');
+            }
+            initializeApp();
+        }, 1100); 
+    } else {
+        if (passwordError) passwordError.classList.remove('hidden');
+        if (passwordBox) passwordBox.classList.add('shake');
+        if (passwordInput) {
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+        setTimeout(() => {
+           if (passwordBox) passwordBox.classList.remove('shake');
+           if (passwordError) passwordError.classList.add('hidden');
+        }, 2000);
+    }
+}
+
+function main() {
+    // Always show password screen on load
+    passwordSubmitBtn?.addEventListener('click', handlePasswordSubmit);
+    passwordInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handlePasswordSubmit();
+        }
+    });
+
+    togglePassword?.addEventListener('click', () => {
+        if (passwordInput) {
+            // Toggle the type
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle the icon
+            togglePassword.classList.toggle('fa-eye');
+            togglePassword.classList.toggle('fa-eye-slash');
+        }
+    });
+
+    if (passwordInput) {
+        passwordInput.focus();
+    }
+}
+
+main();

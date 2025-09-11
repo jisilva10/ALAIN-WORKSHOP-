@@ -21,7 +21,23 @@
 </script>
 </head>
 <body>
-    <div id="app-container">
+    <div id="password-overlay">
+        <div id="password-box">
+            <img src="https://i.imgur.com/yLemUgu.png" alt="A'LAIN Clave" class="modal-image">
+            <h2>Acceso al Workshop</h2>
+            <p>Para continuar, por favor introduce la clave de acceso que te proporcionaron durante el workshop.</p>
+            <div class="password-input-group">
+                <div class="password-input-wrapper">
+                    <input type="password" id="password-input" placeholder="Clave de acceso" aria-label="Clave de acceso">
+                    <i id="toggle-password" class="fas fa-eye" title="Mostrar/Ocultar clave"></i>
+                </div>
+                <button id="password-submit-btn" class="primary-btn">Entrar</button>
+            </div>
+            <p id="password-error" class="hidden">Clave incorrecta. Por favor, inténtalo de nuevo.</p>
+        </div>
+    </div>
+
+    <div id="app-container" style="display: none;">
         <main id="main-content">
             <header id="main-header">
                 <div id="header-left">
