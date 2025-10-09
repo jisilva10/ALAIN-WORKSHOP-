@@ -1,12 +1,12 @@
 import { marked } from "https://esm.sh/marked@^12.0.2";
 import DOMPurify from "https://esm.sh/dompurify@^3.0.8";
-import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, GroundingMetadata } from "https://esm.sh/@google/genai@^1.5.1";
+import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, GroundingMetadata, Type } from "https://esm.sh/@google/genai@^1.5.1";
 import jsPDF from 'https://esm.sh/jspdf@2.5.1';
 import html2canvas from 'https://esm.sh/html2canvas@1.4.1';
 import emailjs from '@emailjs/browser';
 
 // --- Easily Editable Access Key ---
-const ACCESS_KEY = 'PROFEKTUS2025';
+const ACCESS_KEY = 'recomm';
 const API_KEY = process.env.API_KEY;
 
 // --- EmailJS Configuration ---
@@ -322,64 +322,102 @@ async function handleSendEmail() {
 
     emailBtn.disabled = true;
     emailBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-    // Prepare full conversation text
-    const messageStrings = messagesToSend.map(message => {
-        const sender = message.sender === 'user' ? '👤 Tú' : '🤖 A’LAIN';
-        const timestamp = message.timestamp.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'medium' });
-        const cleanedText = cleanMarkdownForEmail(message.text);
-        return `[${timestamp}] ${sender}:\n${cleanedText}`;
-    });
-    
-    const header = "Historial de conversación con A'LAIN\n====================================\n\n";
-    const separator = '\n\n---\n\n';
-    const conversationText = messageStrings.join(separator);
-    const fullTextToSend = header + conversationText;
+    addMessageToChat('system', 'Generando resumen estructurado para enviar...');
 
     try {
-        // Attempt 1: Send the full conversation
-        const templateParams = {
-            to_email: 'jisignacio10@gmail.com', // Hardcoded as requested
-            subject: "Conversación con A'LAIN",
-            message: fullTextToSend,
+        const conversationForSummary = messagesToSend.map(message => {
+            const sender = message.sender === 'user' ? 'Usuario' : 'A’LAIN';
+            return `${sender}: "${cleanMarkdownForEmail(message.text)}"`;
+        }).join('\n\n');
+
+        const summaryPrompt = `Basado en la siguiente conversación entre un "Usuario" y el asistente "A'LAIN", extrae la siguiente información y devuélvela estrictamente en formato JSON:
+1. El nombre y apellido del usuario. Si no se menciona explícitamente, usa el valor "No se especificó el nombre".
+2. La fase del taller en la que el usuario menciona estar (ej. "Fase de Ideación"). Si no se menciona, crea un título conciso de 2-4 palabras que resuma el tema principal (ej. "Liderazgo de Equipos").
+3. Exactamente tres puntos clave de la conversación. Cada punto debe tener como máximo dos oraciones.
+4. Un resumen conciso de la conversación en un solo párrafo.
+
+--- INICIO DE LA CONVERSACIÓN ---
+${conversationForSummary}
+--- FIN DE LA CONVERSACIÓN ---`;
+        
+        const summarySchema = {
+            type: Type.OBJECT,
+            properties: {
+                userName: {
+                    type: Type.STRING,
+                    description: "El nombre y apellido completo del usuario. Si no se encuentra, debe ser 'No se especificó el nombre'.",
+                },
+                projectPhaseOrTopic: {
+                    type: Type.STRING,
+                    description: "La fase del taller mencionada por el usuario, o si no se menciona, un título conciso de 2-4 palabras que describa el tema principal de la conversación.",
+                },
+                keyPoints: {
+                    type: Type.ARRAY,
+                    description: "Una lista de exactamente tres puntos clave de la conversación. Cada punto debe tener un máximo de dos oraciones.",
+                    items: {
+                        type: Type.STRING,
+                    },
+                },
+                summary: {
+                    type: Type.STRING,
+                    description: "Un resumen de la conversación en un solo párrafo.",
+                },
+            },
+            required: ["userName", "projectPhaseOrTopic", "keyPoints", "summary"],
         };
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-        addMessageToChat('system', '✅ ¡Conversación enviada con éxito a Profektus!');
-    } catch (initialError: any) {
-        console.warn("Initial email attempt failed, likely due to size. Attempting to send summary.", initialError);
-        addMessageToChat('system', 'El envío completo falló, probablemente por el tamaño. Generando y enviando un resumen...');
 
-        try {
-            // Attempt 2: Generate and send a summary
-            const conversationForSummary = messagesToSend.map(message => {
-                const sender = message.sender === 'user' ? 'Usuario' : 'A’LAIN';
-                return `${sender}: "${cleanMarkdownForEmail(message.text)}"`;
-            }).join('\n');
+        const summaryResponse = await ai.models.generateContent({
+            model: MODEL_NAME,
+            contents: summaryPrompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: summarySchema,
+            },
+        });
 
-            const summaryPrompt = `Por favor, crea un resumen detallado y específico de la siguiente conversación entre un Usuario y el asistente A'LAIN. El resumen debe ser extenso y cubrir los siguientes puntos en detalle: 1. El problema o consulta inicial del usuario. 2. Los puntos clave, ideas y soluciones discutidas durante la conversación. 3. Las preguntas más importantes realizadas por el usuario y las respuestas correspondientes de A'LAIN. 4. Las conclusiones finales, los acuerdos o los próximos pasos definidos. El objetivo es que una persona que lea el resumen tenga una comprensión completa y profunda de toda la interacción, sin omitir detalles importantes. No te limites en la extensión, la especificidad es la prioridad.\n\n--- INICIO DE LA CONVERSACIÓN ---\n${conversationForSummary}\n--- FIN DE LA CONVERSACIÓN ---`;
-            
-            const summaryResponse = await ai.models.generateContent({
-                model: MODEL_NAME,
-                contents: summaryPrompt,
-            });
-
-            const summaryText = summaryResponse.text;
-            const summarizedMessage = `${header}\n**La conversación original era demasiado larga para ser enviada. A continuación se presenta un resumen generado por IA:**\n\n---\n\n${summaryText}`;
-            
-            const summaryTemplateParams = {
-                to_email: 'jisignacio10@gmail.com',
-                subject: "Conversación con A'LAIN (Resumen)",
-                message: summarizedMessage,
-            };
-
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, summaryTemplateParams);
-            addMessageToChat('system', '✅ ¡Resumen de la conversación enviado con éxito a Profektus!');
-
-        } catch (summaryError: any) {
-            console.error("Error sending summary email:", summaryError);
-            const errorMessage = summaryError?.text || (summaryError instanceof Error ? summaryError.message : 'Ocurrió un error desconocido.');
-            addMessageToChat('error', `El envío del resumen también falló. Por favor, intenta de nuevo más tarde. Error: ${errorMessage}`);
+        const summaryJson = JSON.parse(summaryResponse.text.trim());
+        
+        if (!summaryJson.keyPoints || summaryJson.keyPoints.length === 0) {
+             throw new Error("La IA no generó los puntos clave requeridos.");
         }
+
+        const formattedMessage = `
+Nombre y Apellido: ${summaryJson.userName}
+Tema / Fase: ${summaryJson.projectPhaseOrTopic}
+------------------------------------
+3 puntos claves:
+${summaryJson.keyPoints.map((p: string) => `- ${p}`).join('\n')}
+------------------------------------
+Resumen de la conversacion:
+${summaryJson.summary}
+        `.trim();
+
+        const templateParams = {
+            to_email: 'jisignacio10@gmail.com',
+            subject: `Resumen de Conversación con A'LAIN (${summaryJson.userName} - ${summaryJson.projectPhaseOrTopic})`,
+            message: formattedMessage,
+        };
+
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+        addMessageToChat('system', '✅ ¡Resumen de la conversación enviado con éxito a Profektus!');
+
+    } catch (error: any) {
+        console.error("Error generating or sending summary email:", error);
+        let detailedError = "Ocurrió un error desconocido.";
+        try {
+            const errJson = JSON.parse(error.message || "{}");
+            if (errJson.error && errJson.error.message) {
+                detailedError = errJson.error.message;
+            } else if (error instanceof Error) {
+                detailedError = error.message;
+            }
+        } catch (e) {
+            if (error instanceof Error) {
+                detailedError = error.message;
+            }
+        }
+        
+        addMessageToChat('error', `El envío del resumen falló. Por favor, intenta de nuevo más tarde. Error: ${detailedError}`);
     } finally {
         emailBtn.disabled = false;
         emailBtn.innerHTML = '<i class="fas fa-envelope"></i>';
