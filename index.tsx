@@ -6,7 +6,7 @@ import html2canvas from 'https://esm.sh/html2canvas@1.4.1';
 import emailjs from '@emailjs/browser';
 
 // --- Easily Editable Access Key ---
-const ACCESS_KEY = 'recomm';
+const ACCESS_KEY = 'PROFEKTUS2025';
 const API_KEY = process.env.API_KEY;
 
 // --- EmailJS Configuration ---
