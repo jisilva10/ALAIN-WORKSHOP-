@@ -7,7 +7,7 @@ import emailjs from '@emailjs/browser';
 
 // --- Easily Editable Access Key ---
 const ACCESS_KEY = 'taller2025';
-const API_KEY = process.env.API_KEY;
+const API_KEY = 'AIzaSyAMNwfmXn1NwxQ_GsqXAmN-6HQIA1FgLsw';
 
 // --- EmailJS Configuration ---
 const EMAILJS_SERVICE_ID = 'MAIL GABI';
@@ -35,7 +35,7 @@ DOMPurify.addHook('afterSanitizeAttributes', function (node) {
 const ALAIN_CLIENT_SYSTEM_INSTRUCTION = `You are A’LAIN, an expert AI Consultant created by Profektus to support workshop participants.
 
 **STRICT MANDATE: ONE SINGLE PARAGRAPH ONLY.**
-Your responses must be extremely concise, dense, and high-impact. Maximum length: 1 paragraph (~60-80 words).
+Your responses must be extremely concise, dense, and high-impact. Maximum length: 1 paragraph (~50 words).
 
 **Formatting Rules (Non-negotiable):**
 1.  **NO Lists:** Do NOT use bullet points, numbering, or headers.
