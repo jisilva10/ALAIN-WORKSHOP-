@@ -6,7 +6,7 @@ import html2canvas from 'https://esm.sh/html2canvas@1.4.1';
 import emailjs from '@emailjs/browser';
 
 // --- Easily Editable Access Key ---
-const ACCESS_KEY = 'taller2025';
+const ACCESS_KEY = 'profektustaller';
 
 // --- EmailJS Configuration ---
 const EMAILJS_SERVICE_ID = 'MAIL GABI';
